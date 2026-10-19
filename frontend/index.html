@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="ru" data-theme="red" data-ink="red">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Умный браслет</title>
+  <meta name="description" content="Умный браслет: пульс, кислород, движение, вибро-уведомления и кнопка SOS. Выберите цвет — сайт подстроится.">
+  <meta name="theme-color" content="#d7263d">
+  <script>
+    /* Ставим сохранённый цвет до первой отрисовки, чтобы не было мигания */
+    (function () {
+      var d = document.documentElement;
+      d.classList.add("js");
+      try {
+        var c = localStorage.getItem("bracelet-color");
+        if (["red", "green", "orange", "yellow"].indexOf(c) > -1) { d.dataset.theme = c; d.dataset.ink = c; }
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip" href="#main">К содержимому</a>
+
+  <!-- Слои фона: цвет меняется плавным наложением (только opacity) -->
+  <div class="bg" aria-hidden="true">
+    <i class="bg-layer" data-c="red"></i>
+    <i class="bg-layer" data-c="green"></i>
+    <i class="bg-layer" data-c="orange"></i>
+    <i class="bg-layer" data-c="yellow"></i>
+  </div>
+
+  <header class="top">
+    <a class="brand" href="#hero" aria-label="Умный браслет — наверх">
+      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M3 12h4l2-6 4 12 2-6h6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Умный браслет
+    </a>
+    <nav aria-label="Разделы">
+      <a href="#features">Возможности</a>
+      <a href="#how">Как работает</a>
+      <a href="#device">Устройство</a>
+      <a href="#app" class="btn btn-small" id="navCabinet">Войти</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- ===== ГЕРОЙ ===== -->
+    <section class="hero" id="hero">
+      <div class="hero-copy">
+        <h1 class="in-1">Пульс на руке.<br>Помощь одной кнопкой.</h1>
+        <p class="lead in-2">Браслет измеряет пульс и кислород в крови, чувствует движение, вибрирует при тревоге и отправляет сигнал SOS. Все данные приходят в личный кабинет.</p>
+
+        <fieldset class="picker in-3">
+          <legend>Выберите цвет браслета: весь сайт перекрасится</legend>
+          <div class="swatches" role="radiogroup" aria-label="Цвет браслета" data-group>
+            <button type="button" class="swatch" data-color="red"    role="radio" aria-checked="true"  style="--c:#e11d2e"><span class="dot"></span><span class="name">Красный</span></button>
+            <button type="button" class="swatch" data-color="green"  role="radio" aria-checked="false" style="--c:#16a05a"><span class="dot"></span><span class="name">Зелёный</span></button>
+            <button type="button" class="swatch" data-color="orange" role="radio" aria-checked="false" style="--c:#ff8a1f"><span class="dot"></span><span class="name">Оранжевый</span></button>
+            <button type="button" class="swatch" data-color="yellow" role="radio" aria-checked="false" style="--c:#ffd21f"><span class="dot"></span><span class="name">Жёлтый</span></button>
+          </div>
+        </fieldset>
+
+        <div class="hero-actions in-4">
+          <a class="btn btn-big" href="#app">Войти в кабинет</a>
+          <a class="link" href="#device">Из чего он собран</a>
+        </div>
+      </div>
+
+      <div class="stage in-2">
+        <div class="halos" aria-hidden="true">
+          <i class="halo" data-c="red"></i><i class="halo" data-c="green"></i><i class="halo" data-c="orange"></i><i class="halo" data-c="yellow"></i>
+        </div>
+        <div class="bignum" id="bigNum" aria-hidden="true">72</div>
+
+        <div class="bracelet-wrap" id="braceletWrap">
+          <svg class="bracelet" viewBox="0 0 400 640" role="img" aria-label="Смарт-браслет выбранного цвета">
+            <defs>
+              <linearGradient id="fadeY" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+                <stop offset=".12" stop-color="#fff" stop-opacity="1"/>
+                <stop offset=".88" stop-color="#fff" stop-opacity="1"/>
+                <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+              </linearGradient>
+              <mask id="fadeMask"><rect width="400" height="640" fill="url(#fadeY)"/></mask>
+              <linearGradient id="strapShade" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#000" stop-opacity=".22"/>
+                <stop offset=".35" stop-color="#fff" stop-opacity=".10"/>
+                <stop offset=".7" stop-color="#000" stop-opacity="0"/>
+                <stop offset="1" stop-color="#000" stop-opacity=".25"/>
+              </linearGradient>
+              <linearGradient id="caseGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#2b3038"/>
+                <stop offset="1" stop-color="#0e1014"/>
+              </linearGradient>
+              <filter id="drop" x="-30%" y="-10%" width="160%" height="130%">
+                <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#000" flood-opacity=".35"/>
+              </filter>
+              <g id="strapShapes">
+                <path d="M138 200 C138 130 148 60 150 -10 L250 -10 C252 60 262 130 262 200 Z"/>
+                <path d="M138 440 C138 510 148 580 150 650 L250 650 C252 580 262 510 262 440 Z"/>
+                <rect x="136" y="96" width="128" height="30" rx="14"/>
+              </g>
+            </defs>
+
+            <g mask="url(#fadeMask)" filter="url(#drop)">
+              <use href="#strapShapes" class="strap-layer" data-c="red"    style="fill:#e11d2e"/>
+              <use href="#strapShapes" class="strap-layer" data-c="green"  style="fill:#16a05a"/>
+              <use href="#strapShapes" class="strap-layer" data-c="orange" style="fill:#ff8a1f"/>
+              <use href="#strapShapes" class="strap-layer" data-c="yellow" style="fill:#ffd21f"/>
+              <path d="M138 200 C138 130 148 60 150 -10 L250 -10 C252 60 262 130 262 200 Z" fill="url(#strapShade)"/>
+              <path d="M138 440 C138 510 148 580 150 650 L250 650 C252 580 262 510 262 440 Z" fill="url(#strapShade)"/>
+              <rect x="136" y="96" width="128" height="30" rx="14" fill="#000" fill-opacity=".16"/>
+              <g class="holes">
+                <ellipse cx="200" cy="500" rx="9" ry="6.5"/>
+                <ellipse cx="200" cy="530" rx="9" ry="6.5"/>
+                <ellipse cx="200" cy="560" rx="9" ry="6.5"/>
+                <ellipse cx="200" cy="590" rx="9" ry="6.5"/>
+              </g>
+            </g>
+
+            <rect x="118" y="176" width="164" height="288" rx="58" fill="url(#caseGrad)"/>
+            <rect x="118" y="176" width="164" height="288" rx="58" fill="none" stroke="#fff" stroke-opacity=".14" stroke-width="2"/>
+            <rect x="282" y="268" width="7" height="46" rx="3.5" fill="#1a1d23"/>
+            <rect x="132" y="192" width="136" height="256" rx="46" fill="#05070a"/>
+            <text x="200" y="262" text-anchor="middle" class="scr-label" id="scrLabel">демо</text>
+            <path class="scr-heart" d="M200 322 C176 304 172 284 186 280 C194 278 200 284 200 290 C200 284 206 278 214 280 C228 284 224 304 200 322 Z"/>
+            <text x="200" y="378" text-anchor="middle" class="scr-num" id="scrNum">72</text>
+            <text x="200" y="402" text-anchor="middle" class="scr-unit">уд/мин</text>
+            <polyline class="scr-line" points="150,426 170,426 178,414 188,438 198,420 206,426 250,426"/>
+            <g class="scr-sos" id="scrSos">
+              <rect x="132" y="192" width="136" height="256" rx="46" fill="#d7263d"/>
+              <text x="200" y="338" text-anchor="middle" class="sos-big">SOS</text>
+              <text x="200" y="372" text-anchor="middle" class="sos-sub">сигнал отправлен</text>
+            </g>
+          </svg>
+
+          <button type="button" class="hot hot-screen" data-hint="Экран показывает пульс. Сердце на нём бьётся в такт показанному значению." aria-label="Экран браслета"></button>
+          <button type="button" class="hot hot-sos" id="sosBtn" data-hint="Кнопка SOS на боку корпуса. Нажмите её, чтобы увидеть, как это работает." aria-label="Кнопка SOS: показать демо"></button>
+          <button type="button" class="hot hot-strap" data-hint="Ремешок меняет цвет. Выберите свой кнопками слева, фон сайта подстроится." aria-label="Ремешок"></button>
+        </div>
+
+        <p class="hint" id="hint" aria-live="polite">Нажмите на жёлтую точку сбоку или наведите на другие.</p>
+      </div>
+    </section>
+
+    <!-- ===== ПОЛОСА: из чего состоит ===== -->
+    <section class="ticker" aria-label="Основные компоненты">
+      <div class="ticker-in">
+        <div data-reveal style="--i:0"><strong>MAX30100</strong><span>пульс и кислород</span></div>
+        <div data-reveal style="--i:1"><strong>MPU6050</strong><span>движение руки</span></div>
+        <div data-reveal style="--i:2"><strong>3 В</strong><span>вибромоторчик</span></div>
+        <div data-reveal style="--i:3"><strong>SOS</strong><span>кнопка помощи</span></div>
+      </div>
+    </section>
+
+    <!-- ===== ВОЗМОЖНОСТИ ===== -->
+    <section class="block" id="features">
+      <h2 data-reveal>Что умеет браслет</h2>
+      <div class="features">
+        <article class="tile tile-main" data-reveal style="--i:0">
+          <svg class="ico" viewBox="0 0 48 48" aria-hidden="true"><path d="M4 26h10l5-13 8 24 5-11h12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h3>Пульс и кислород</h3>
+          <p>Оптический датчик подсвечивает кожу и по отражённому свету считает пульс и примерную сатурацию кислорода в крови. Окно датчика должно прилегать к коже.</p>
+        </article>
+        <article class="tile" data-reveal style="--i:1">
+          <svg class="ico" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 34c6-14 14-20 32-22M8 34l6-1M8 34l1-6M40 12l-6 1M40 12l-2 6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h3>Движение</h3>
+          <p>Акселерометр и гироскоп фиксируют ускорение и вращение руки.</p>
+          <p class="note">Клинически проверенного определения падений нет.</p>
+        </article>
+        <article class="tile" data-reveal style="--i:2">
+          <svg class="ico" viewBox="0 0 48 48" aria-hidden="true"><rect x="16" y="12" width="16" height="24" rx="5" fill="none" stroke="currentColor" stroke-width="3"/><path d="M8 18v12M4 21v6M40 18v12M44 21v6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+          <h3>Вибрация</h3>
+          <p>Маленький моторчик тихо сообщает о тревоге на запястье.</p>
+        </article>
+        <article class="tile tile-wide" data-reveal style="--i:3">
+          <svg class="ico" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="16" fill="none" stroke="currentColor" stroke-width="3"/><path d="M17 20c0-4 14-4 14 0 0 5-14 3-14 8 0 4 14 4 14 0" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+          <h3>Кнопка SOS</h3>
+          <p>Нажатие отправляет просьбу о помощи в подключённую систему. Это ручной сигнал: браслет сам ничего не решает.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===== КАК РАБОТАЕТ ===== -->
+    <div class="invert"><section class="block" id="how">
+      <h2 data-reveal>Как это работает</h2>
+      <ol class="steps" data-reveal>
+        <li style="--i:0"><span class="n">1</span><h3>Надеваете</h3><p>Датчик на обратной стороне касается кожи.</p></li>
+        <li style="--i:1"><span class="n">2</span><h3>Браслет измеряет</h3><p>Считает пульс, кислород и следит за движением.</p></li>
+        <li style="--i:2"><span class="n">3</span><h3>Данные уходят в кабинет</h3><p>Контроллер ESP32-C3 передаёт их по беспроводной связи на сервер.</p></li>
+        <li style="--i:3"><span class="n">4</span><h3>Вы видите и получаете тревогу</h3><p>Если показатель вышел за границу правила, в кабинете появляется уведомление.</p></li>
+      </ol>
+    </section></div>
+
+    <!-- ===== УСТРОЙСТВО ===== -->
+    <section class="block" id="device">
+      <h2 data-reveal>Из чего он собран</h2>
+      <p class="lead small" data-reveal>Сборка на одной плате около 60 × 35 мм. Размеры корпуса и схема питания ещё проверяются.</p>
+
+      <div class="gallery">
+        <figure class="shot shot-wide" data-reveal>
+          <img src="img/enclosure.jpg" alt="Корпус браслета в разобранном виде: крышка, плата с батареей, основание с окном датчика" width="1400" height="1025" loading="lazy">
+          <figcaption>Корпус в разборе: крышка, электроника, основание с оптическим окном.</figcaption>
+        </figure>
+        <figure class="shot" data-reveal style="--i:1">
+          <img src="img/views.jpg" alt="Браслет сверху, сбоку и со стороны кожи" width="1400" height="945" loading="lazy">
+          <figcaption>Сверху, сбоку и со стороны кожи.</figcaption>
+        </figure>
+        <figure class="shot" data-reveal style="--i:2">
+          <img src="img/board.jpg" alt="Плата сверху с подписанными компонентами" width="956" height="544" loading="lazy">
+          <figcaption>Плата сверху: все компоненты на своих местах.</figcaption>
+        </figure>
+      </div>
+
+      <dl class="specs">
+        <div data-reveal><dt>Контроллер</dt><dd>ESP32-C3 SuperMini: читает датчики и передаёт данные по беспроводной связи</dd></div>
+        <div data-reveal><dt>Пульс и SpO₂</dt><dd>MAX30100, окно датчика должно прилегать к коже</dd></div>
+        <div data-reveal><dt>Движение</dt><dd>MPU6050, акселерометр и гироскоп</dd></div>
+        <div data-reveal><dt>Батарея</dt><dd>LiPo 3,7 В, 450 мАч (LWC 403040). Время работы пока не оценивалось</dd></div>
+        <div data-reveal><dt>Зарядка</dt><dd>Модуль TP4056 с USB-C. Ток зарядки должен подходить батарее</dd></div>
+        <div data-reveal><dt>Вибромотор</dt><dd>Монета 3 В, включается через MOSFET AO3400 или аналог</dd></div>
+        <div data-reveal><dt>Помощь</dt><dd>Кнопка SOS на боку корпуса</dd></div>
+      </dl>
+      <p class="disclaimer" data-reveal>Учебный прототип, не медицинское диагностическое устройство.</p>
+    </section>
+
+    <!-- ===== КАБИНЕТ ===== -->
+    <section class="block app" id="app">
+      <!-- гость: слева пояснение, справа карточка входа -->
+      <div id="guest" class="app-split">
+        <div class="app-intro" data-reveal>
+          <h2>Личный кабинет</h2>
+          <p class="lead small">Войдите, чтобы видеть данные своего браслета. Впервые у нас? Откройте вкладку «Регистрация» справа.</p>
+          <ul class="checks">
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Пульс, кислород и заряд в одном месте</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Уведомления, когда показатель вышел за границу</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Свои правила для каждого браслета</li>
+          </ul>
+        </div>
+
+        <div class="auth-card" data-reveal style="--i:1">
+          <div class="seg" role="tablist" aria-label="Вход или регистрация">
+            <button type="button" role="tab" id="tabLogin" aria-selected="true" aria-controls="formLogin">Вход</button>
+            <button type="button" role="tab" id="tabRegister" aria-selected="false" aria-controls="formRegister">Регистрация</button>
+          </div>
+
+          <form id="formLogin" class="form" autocomplete="on" novalidate>
+            <h3>Вход в кабинет</h3>
+            <label class="field"><span class="field-label">Электронная почта</span>
+              <span class="field-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l9 6 9-6M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+              <input type="email" name="email" autocomplete="email" placeholder="name@example.com" required></span></label>
+            <label class="field"><span class="field-label">Пароль</span>
+              <span class="field-box"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+              <input type="password" name="password" autocomplete="current-password" placeholder="Ваш пароль" required>
+              <button type="button" class="reveal" aria-pressed="false">Показать</button></span></label>
+            <p class="msg" role="alert" data-msg></p>
+            <button class="btn btn-card" type="submit">Войти</button>
+            <p class="switch">Нет аккаунта? <button type="button" class="link-btn" data-switch="register">Зарегистрироваться</button></p>
+          </form>
+
+          <form id="formRegister" class="form" autocomplete="on" hidden novalidate>
+            <h3>Создать аккаунт</h3>
+            <label class="field"><span class="field-label">Ваше имя</span>
+              <span class="field-box"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="3.7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 20c.8-3.6 3.7-5.5 7.5-5.5s6.7 1.9 7.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <input type="text" name="name" autocomplete="name" maxlength="100" placeholder="Например, Айдана" required></span></label>
+            <label class="field"><span class="field-label">Электронная почта</span>
+              <span class="field-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l9 6 9-6M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+              <input type="email" name="email" autocomplete="email" placeholder="name@example.com" required></span></label>
+            <label class="field"><span class="field-label">Пароль <em>не короче 8 символов</em></span>
+              <span class="field-box"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+              <input type="password" name="password" autocomplete="new-password" minlength="8" placeholder="Придумайте пароль" required>
+              <button type="button" class="reveal" aria-pressed="false">Показать</button></span></label>
+            <p class="msg" role="alert" data-msg></p>
+            <button class="btn btn-card" type="submit">Создать аккаунт</button>
+            <p class="switch">Уже есть аккаунт? <button type="button" class="link-btn" data-switch="login">Войти</button></p>
+          </form>
+        </div>
+      </div>
+
+      <!-- пользователь -->
+      <div id="dash" hidden>
+        <h2>Личный кабинет</h2>
+        <div class="dash-head">
+          <p>Вы вошли как <strong id="userName"></strong></p>
+          <button type="button" class="link-btn" id="logout">Выйти</button>
+        </div>
+
+        <div class="dash-grid">
+          <section class="panel wide" aria-labelledby="hBr">
+            <h3 id="hBr">Мои браслеты</h3>
+            <div class="row">
+              <label class="grow">Выбранный браслет
+                <select id="braceletSelect"></select>
+              </label>
+              <form id="formAddBracelet" class="inline">
+                <label class="grow">Новый браслет
+                  <input type="text" name="name" maxlength="100" placeholder="Например, браслет бабушки" required>
+                </label>
+                <button class="btn" type="submit">Добавить</button>
+              </form>
+            </div>
+            <p class="msg" role="alert" data-msg id="msgBracelet"></p>
+            <div id="keyBox" class="keybox" hidden>
+              <p>Ключ устройства показывается один раз. Скопируйте его и вставьте в прошивку браслета.</p>
+              <code id="keyValue"></code>
+              <button type="button" class="btn btn-small" id="copyKey">Скопировать</button>
+            </div>
+            <div class="row small-row" id="braceletTools" hidden>
+              <form id="formRename" class="inline">
+                <label class="grow">Переименовать<input type="text" name="name" maxlength="100" required></label>
+                <button class="btn btn-small" type="submit">Сохранить</button>
+              </form>
+              <button type="button" class="btn btn-small btn-ghost" id="rotateKey">Выпустить новый ключ</button>
+            </div>
+            <p class="empty" id="noBracelets" hidden>Браслетов пока нет. Добавьте первый, и он появится здесь.</p>
+          </section>
+
+          <section class="panel" aria-labelledby="hLast">
+            <h3 id="hLast">Последнее измерение</h3>
+            <div class="vitals" id="vitals">
+              <div><span class="v" id="vHr">—</span><span class="u">пульс, уд/мин</span></div>
+              <div><span class="v" id="vSpo2">—</span><span class="u">кислород, %</span></div>
+              <div><span class="v" id="vBat">—</span><span class="u">заряд, %</span></div>
+            </div>
+            <p class="meta" id="vWhen">Измерений пока нет.</p>
+            <p class="meta" id="vLoc"></p>
+          </section>
+
+          <section class="panel" aria-labelledby="hEmu">
+            <h3 id="hEmu">Проверка без железа</h3>
+            <p class="hint-text">Отправьте тестовое измерение так же, как это сделает браслет.</p>
+            <form id="formEmu" class="form tight">
+              <label>Ключ устройства<input type="password" name="key" autocomplete="off" placeholder="Вставьте ключ" required></label>
+              <div class="three">
+                <label>Пульс<input type="number" name="hr" min="1" max="250" value="72"></label>
+                <label>SpO₂<input type="number" name="spo2" min="0" max="100" step="0.1" value="97"></label>
+                <label>Заряд<input type="number" name="bat" min="0" max="100" value="80"></label>
+              </div>
+              <p class="msg" role="alert" data-msg></p>
+              <button class="btn" type="submit">Отправить измерение</button>
+            </form>
+          </section>
+
+          <section class="panel wide" aria-labelledby="hHist">
+            <h3 id="hHist">История измерений</h3>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th scope="col">Время</th><th scope="col">Пульс</th><th scope="col">SpO₂</th><th scope="col">Заряд</th></tr></thead>
+                <tbody id="histBody"></tbody>
+              </table>
+            </div>
+            <p class="empty" id="histEmpty" hidden>Пока пусто. Отправьте тестовое измерение или подключите браслет.</p>
+          </section>
+
+          <section class="panel" aria-labelledby="hNot">
+            <h3 id="hNot">Уведомления</h3>
+            <ul class="list" id="notList"></ul>
+            <p class="empty" id="notEmpty" hidden>Тревог нет. Они появятся, когда показатель выйдет за границы правила.</p>
+          </section>
+
+          <section class="panel" aria-labelledby="hRules">
+            <h3 id="hRules">Правила тревоги</h3>
+            <ul class="list" id="ruleList"></ul>
+            <p class="empty" id="ruleEmpty" hidden>Правил нет. Создайте первое ниже.</p>
+            <form id="formRule" class="form tight">
+              <div class="three">
+                <label>Показатель
+                  <select name="metric">
+                    <option value="heart_rate">Пульс</option>
+                    <option value="spo2">SpO₂</option>
+                    <option value="battery_level">Заряд</option>
+                  </select>
+                </label>
+                <label>Не ниже<input type="number" name="min" step="any"></label>
+                <label>Не выше<input type="number" name="max" step="any"></label>
+              </div>
+              <p class="msg" role="alert" data-msg></p>
+              <button class="btn" type="submit">Добавить правило</button>
+            </form>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="foot-in">
+      <p class="foot-brand">Умный браслет</p>
+      <nav aria-label="Нижнее меню">
+        <a href="#features">Возможности</a>
+        <a href="#how">Как работает</a>
+        <a href="#device">Устройство</a>
+        <a href="#app">Кабинет</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- плавающий выбор цвета: доступен при прокрутке -->
+  <div class="dock" id="dock" role="radiogroup" aria-label="Цвет браслета" data-group>
+    <button type="button" class="dock-dot" data-color="red"    role="radio" aria-checked="true"  aria-label="Красный"    style="--c:#e11d2e"></button>
+    <button type="button" class="dock-dot" data-color="green"  role="radio" aria-checked="false" aria-label="Зелёный"    style="--c:#16a05a"></button>
+    <button type="button" class="dock-dot" data-color="orange" role="radio" aria-checked="false" aria-label="Оранжевый"  style="--c:#ff8a1f"></button>
+    <button type="button" class="dock-dot" data-color="yellow" role="radio" aria-checked="false" aria-label="Жёлтый"     style="--c:#ffd21f"></button>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
